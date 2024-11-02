@@ -1,34 +1,85 @@
 import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
 import './App.css'
+import {FontAwesomeIcon} from '@fortawesome/react-fontawesome';
 
 function App() {
-  const [count, setCount] = useState(0)
 
+  const [tasks, setTasks] = useState([
+    "To study ReactJS in the morning",
+    "To work in the afternoon",
+    "To study API's at night"
+  ]);
+
+  const [input, setInput] = useState("");
+  const [editTask, setEditTask] = useState({
+    enabled: false,
+    task: ''
+  })
+
+  function handleDelete (item: string) {
+    let removeList = tasks.filter( task => task !== item)
+    setTasks(removeList);
+  }
+
+  function handleEdit (item: string) {
+    setInput(item);
+    setEditTask({
+      enabled: true,
+      task: item
+    })
+  }
+
+    
+  function handleRegister() {
+    if (!input) {
+      alert("Insira uma tarefa antes de pressionar o botão REGISTRAR.")
+    }
+
+    if (editTask.enabled) {
+      handleSaveEdit();
+      return;
+    }
+
+    setTasks(tarefas => [...tarefas, input]);
+    setInput("");
+  }
+
+  function handleSaveEdit() {
+    const findIndexTask = tasks.findIndex(task => task === editTask.task)
+    const allTasks = [...tasks];
+    allTasks[findIndexTask] = input;
+    setTasks(allTasks);
+
+    setEditTask({
+      enabled: false,
+      task: ''
+    })
+
+    setInput("");
+  }
+  
   return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
+    <div className="tasksContainer">
+      <h1> Tasks List </h1>
+      <div className="inputContainer">
+        <input
+        className="inputTask"
+        placeholder="Digite sua tarefa aqui..."
+        value={input}
+        onChange={ e => setInput(e.target.value)}
+        />
+        <button onClick={handleRegister}> {editTask.enabled? "Atualizar" : "Registrar"} </button>
       </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
+      <section>
+      {tasks.map( (item, index) => (
+        <div className="taskItem">
+          <span key={item}> {item} </span>
+          <button className="edit-btn" onClick={() => { handleEdit(item) }}> Editar </button>
+          <button className="delete-btn" onClick={() => { handleDelete(item) }}> Excluir </button>
+        </div>
+      ))}
+      </section>
+    </div>
   )
 }
 
